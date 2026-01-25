@@ -1,0 +1,91 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.tituloPagina {
+  text-align: center;
+  margin: 25px 0;
+  letter-spacing: 2px;
+}
+
+.armazenar {
+  display: flex;
+  flex-flow: row wrap;
+}
+
+
+
+.card {
+  position: relative;
+  margin: 10px 20px;
+  padding: 10px;
+  width: 230px;
+  height: 310px;
+  box-shadow: 0 0 5px black;
+  border: 1px solid black;
+  border-radius: 10px;
+}
+
+@media (max-width: 570px) {
+  .card {
+  margin: 10px 10px;
+  width: 230px;
+
+}
+
+}
+.card h3 {
+  font-weight: lighter;
+}
+
+.deletar {
+  color: white;
+  font-weight: bolder;
+  background-image: linear-gradient(
+    to right,
+    rgb(165, 75, 75),
+    rgb(175, 101, 67)
+  );
+  border: none;
+  border-radius: 4px;
+  padding: 5px 15px;
+  position: relative;
+  top: 0;
+  left: 0;
+}
+
+.concluir {
+  padding: 7px 0px;
+  border-radius: 7px;
+  color: white;
+  font-weight: bolder;
+  background-image: linear-gradient(to right, rgb(101, 101, 173), blue);
+  border: none;
+  position: absolute;
+  bottom: 10px;
+  width: 90%;
+}
+
+.adicionar {
+  padding: 10px 20px;
+  border-radius: 7px;
+  color: white;
+  font-weight: bolder;
+  background-image: linear-gradient(to right, rgb(101, 101, 173), blue);
+  border: none;
+  position: fixed;
+  bottom: 45px;
+  right: 45px;
+}
+
+.card p {
+  text-align: center;
+  font-size: 20px;
+  margin: 25px 15px;
+}
+
+progress {
+  position: absolute;
+}
