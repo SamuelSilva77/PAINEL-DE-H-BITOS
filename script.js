@@ -1,173 +1,165 @@
-//ELEMENTOS
+//API
+let api = fetch("https://697011fda06046ce61887960.mockapi.io/habitos");
+
+//BOTAO ADICIONAR
 let adicionar = document.querySelector(".adicionar");
+
+//DIV ONDE FICARÃOP AS TAREFAS
 let armazenar = document.querySelector(".armazenar");
-let endereco = 10;
-//EVENTOS
+
+//ADICIONAR TAREFA
 adicionar.addEventListener("click", () => {
-  ++endereco;
+  let tarefa = prompt("Digite sua tarefa");
+  if (tarefa) {
+    let meta = Number(prompt("Digite sua meta para essa tarefa"));
+    while (!meta) {
+      meta =  Number(prompt("Digite sua meta para essa tarefa"));
+    }
 
-  let tarefa = prompt("Insira seu hábito");
-  while (!tarefa || !isNaN(tarefa)) {
-    tarefa = prompt("Insira seu Hábito");
+    armazenar.innerHTML += `
+          <div class="card" id="${tarefa}">
+            <button class="deletar" onclick="deletar('${tarefa}')"> Deletar </button>   
+
+            <p> ${tarefa} </p>
+
+            <h3 > Dias Concluídos: <span id="span${tarefa}"> 0 </span> </h3>
+            <br>
+            <h3> Meta De Dias: ${meta} </h3>
+
+            <progress value="0" max="${meta}" id="${tarefa + meta}"></progress>
+
+            <button class="concluir" onclick="concluiHoje('span${tarefa}', '${tarefa + meta}', '${tarefa}', '${meta}')"> Concluí Hoje!! </button>
+        </div>
+  `;
+
+  let dia = new Date().getDate() - 1
+
+    fetch("https://697011fda06046ce61887960.mockapi.io/habitos", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        tarefa: tarefa,
+        meta: meta, 
+        diasConcluidos: 0,
+        ultimoDia: dia
+      }),
+    });
   }
-
-  let metaDeDias = prompt("Insira sua meta para esse hábito");
-  while (!metaDeDias || isNaN(metaDeDias)) {
-    metaDeDias = prompt("Insira sua meta para esse hábito");
-  }
-
-  armazenar.innerHTML += `<div class = "card" id="${tarefa}">
-        <button class="deletar" onclick="deletar('${tarefa}')"> Deletar </button>   
-
-        <p> ${tarefa.toUpperCase()} </p>
-
-        <h3 > Dias Concluídos: <span id="${endereco}"> 0 </span> </h3>
-        <br>
-        <h3> Meta De Dias: ${metaDeDias}</h3>
-        <progress value="" id="${tarefa + metaDeDias}" max="${Number(metaDeDias)}"></progress>
-        <button class="concluir" onclick="aumentar('${endereco}', '${tarefa + metaDeDias}', '${tarefa}', '${metaDeDias}')"> Concluí Hoje!! </button>
-
-     </div>`;
-
-  let diaAtual = new Date().getDate() - 1;
-
-  let conjunto = JSON.stringify({
-    tarefa: tarefa,
-    metaDeDias: metaDeDias,
-    ultimaData: diaAtual,
-  });
-  localStorage.setItem(tarefa, conjunto);
 });
 
-const aumentar = (endereco, progresso, tarefa, meta) => {
-  let pegar = localStorage.getItem(tarefa);
-  let obj = JSON.parse(pegar);
-  //VERIFICAR ULTIMA DATA
-  let diaNovo = new Date().getDate();
+//CONCLUIR META
+async function concluiHoje(idSpan, barra, tarefa, meta){
+  //API
+  let api = await fetch("https://697011fda06046ce61887960.mockapi.io/habitos/")
+  let respost = await api.json()
 
-  if (diaNovo > obj.ultimaData || diaNovo == 1) {
-    let sequencia = document.getElementById(endereco);
-    sequencia.innerHTML = parseInt(sequencia.innerHTML) + 1;
-    let numeros = sequencia.innerHTML;
+  //VERIFICAR SE JA FEZ A TAREFA HOJE
+  let diaAtual = new Date().getDate()
 
-    //IPLEMENTAR NO ARRAY O ENDERECO
-    obj.endereco = numeros;
-
-    //BARRA DE PROGRESSO
-    let progress = document.getElementById(progresso);
-    console.log(progresso);
-    console.log(progress);
-    progress.value += 1;
-    obj.barra = progress.value;
-
-    //VERIFICAR SE BATEU A META
-    if (progress.value == meta) {
-      metaDeDias = prompt("Você bateu a meta!! Insira uma nova");
-      while (
-        !metaDeDias ||
-        isNaN(metaDeDias) ||
-        metaDeDias < parseInt(sequencia.innerHTML) ||
-        metaDeDias - 1 < parseInt(sequencia.innerHTML)
-      ) {
-        metaDeDias = prompt("Você bateu sua meta! Insira uma nova");
-      }
-      obj.metaDeDias = metaDeDias;
-      obj.barra = parseInt(sequencia.innerHTML);
-      location.reload();
+  respost.forEach((index) => {
+    if(index.tarefa == tarefa){
+      diaArmazenado = index.ultimoDia
     }
+  })
+  
+  if(diaAtual > diaArmazenado || diaAtual == 1){
+  //AUMENTAR DIAS CONCLUIDOS
+  let dias = parseInt(document.getElementById(idSpan).innerHTML)
+  document.getElementById(idSpan).innerHTML = dias + 1
 
-    //SALVAR NO STORAGE
-    obj.ultimaData = diaNovo;
-    let transform = JSON.stringify(obj);
-    localStorage.setItem(tarefa, transform);
+  //AUMENTAR BARRA DE PROGRESSO
+  let barraProgresso = document.getElementById(barra)
+  barraProgresso.value = dias + 1
 
-    //
-
-    switch (sequencia.innerHTML) {
-      case "1":
-        alert("Parabéns! Esse é o primeiro passo!");
-        break;
-      case "10":
-        alert("Já fazem 10 dias consecutivos que você está focado! Parabéns!!");
-        break;
-      case "25":
-        alert("Já fazem 25 dias! Rumo aos 50!");
-        break;
-      case "50":
-        alert("100 DIAS! Isso é de dar inveja!!");
-        break;
+  //VERIFICAR SE BATEU A META
+  if(barraProgresso.value == meta){
+    meta = Number(prompt("Você bateu a meta! Insira uma nova"))
+    while(!meta){
+      meta = Number(prompt("Você bateu a meta! Insira uma nova"))
     }
-  } else {
-    alert("Você já concluiu essa tarefa Hoje!");
   }
-};
-
-const deletar = (id) => {
-  let elemento = document.getElementById(id);
-  elemento.remove();
-  localStorage.removeItem(id);
-};
-
-for (let i = 0; i < localStorage.length; i++) {
-  let pegar = localStorage.key(i);
-  let data = new Date().getDate();
-
-  if (isNaN(pegar)) {
-    endereco++;
-    let pegarTarefa = localStorage.getItem(pegar);
-    let transformar = JSON.parse(pegarTarefa);
-    console.log(data > transformar.ultimaData + 1);
-
-    if (data > transformar.ultimaData + 1) {
-      console.log("sl");
-      armazenar.innerHTML += `<div class = "card" id="${transformar.tarefa}">
-        <button class="deletar" onclick="deletar('${transformar.tarefa}')"> Deletar </button>   
-
-        <p> ${pegar.toUpperCase()} </p>
-
-        <h3 > Dias Concluídos: <span id="${endereco}"> 0 </span> </h3>
-        <br>
-        <h3> Meta de Dias: ${transformar.metaDeDias}</h3>
-        <progress value="${transformar.barra}" id="${transformar.tarefa + transformar.metaDeDias}"  max="${transformar.metaDeDias}"></progress>
-        <button class="concluir" onclick="aumentar('${endereco}', '${transformar.metaDeDias}', '${transformar.tarefa}')"> Concluí Hoje!! </button>
-
-     </div>`;
-
-      alert(
-        "A ATIVIDADE: " +
-          transformar.tarefa +
-          " foi zera pois nao foi feita no ultimo dia",
-      );
-      transformar.barra = 0;
-      transformar.ultimaData = data - 1;
-      let destransformar = JSON.stringify(transformar);
-      localStorage.setItem(pegar, destransformar);
-    } else if (!transformar.endereco) {
-      armazenar.innerHTML += `<div class = "card" id="${transformar.tarefa}">
-        <button class="deletar" onclick="deletar('${transformar.tarefa}')"> Deletar </button>   
-
-        <p> ${pegar.toUpperCase()} </p>
-
-        <h3 > Dias Concluídos: <span id="${endereco}"> 0 </span> </h3>
-        <br>
-        <h3> Meta de Dias: ${transformar.metaDeDias}</h3>
-        <progress value="${transformar.barra}" id="${transformar.tarefa + transformar.metaDeDias}"  max="${transformar.metaDeDias}"></progress>
-        <button class="concluir" onclick="aumentar('${endereco}', '${transformar.metaDeDias}', '${transformar.tarefa}')"> Concluí Hoje!! </button>
-
-     </div>`;
-    } else {
-      armazenar.innerHTML += `<div class = "card" id="${transformar.tarefa}">
-        <button class="deletar" onclick="deletar('${transformar.tarefa}', '${endereco}')"> Deletar </button>   
-
-        <p> ${transformar.tarefa.toUpperCase()} </p>
-
-        <h3 > Dias Concluídos: <span id="${endereco}"> ${transformar.endereco} </span> </h3>
-        <br>
-        <h3> Meta De Dias: ${transformar.metaDeDias} </h3>
-        <progress value="${transformar.barra}" id="${transformar.tarefa + transformar.metaDeDias}" max="${transformar.metaDeDias}"></progress>
-        <button class="concluir" onclick="aumentar('${endereco}', '${transformar.tarefa + transformar.metaDeDias}', '${transformar.tarefa}', '${transformar.metaDeDias}')"> Concluí Hoje!! </button>
-
-     </div>`;
+  console.log(meta)
+  //SALVAR NA API
+  respost.forEach(index => {
+    if(index.tarefa == tarefa){
+      fetch("https://697011fda06046ce61887960.mockapi.io/habitos/" + index.id, {
+        method: "PUT",
+        headers: {
+          "content-type": "application/json"
+        },
+        body: JSON.stringify({
+          tarefa: tarefa,
+          meta: meta,
+          diasConcluidos: dias + 1,
+          ultimoDia: diaAtual
+        })
+      })
     }
+  })
+
+  
+  }else{
+    alert("Você já concluiu sua tarefa hoje!")
   }
 }
+
+
+//DELETAR TAREFA
+async function deletar(tarefa){
+  let div = document.getElementById(tarefa);
+  div.remove()
+
+  //DELETAR DA API
+  try{
+  let api = await fetch("https://697011fda06046ce61887960.mockapi.io/habitos");
+  let resposta = await api.json()
+
+  resposta.forEach(index => {
+    if(index.tarefa == tarefa){
+      fetch("https://697011fda06046ce61887960.mockapi.io/habitos/" + index.id, {
+        method: "DELETE"
+      })
+    }
+  });
+  }catch(err){
+    alert("Erro! Tente Novamente mais tarde")
+  }
+
+}
+
+
+//CARREGAR TAREFAS
+async function passarDados(){
+  try{
+  let api = await fetch("https://697011fda06046ce61887960.mockapi.io/habitos")
+  return await api.json()
+  }catch(err){
+    alert("Erro! Tente novamente mais tarde")
+  }
+}
+
+async function carregarTarefas() {
+  let dados = await passarDados()
+
+  dados.forEach((index) => {
+        armazenar.innerHTML += `
+          <div class="card" id="${index.tarefa}">
+            <button class="deletar" onclick="deletar('${index.tarefa}')"> Deletar </button>   
+
+            <p> ${index.tarefa} </p>
+
+            <h3 > Dias Concluídos: <span id="span${index.tarefa}"> ${index.diasConcluidos} </span> </h3>
+            <br>
+            <h3> Meta De Dias: ${index.meta} </h3>
+
+            <progress value="${index.diasConcluidos}" max="${index.meta}" id="${index.tarefa + index.meta}"></progress>
+
+            <button class="concluir" onclick="concluiHoje('span${index.tarefa}', '${index.tarefa + index.meta}', '${index.tarefa}', '${index.meta}')"> Concluí Hoje!! </button>
+        </div>
+  `;
+  })
+}
+
+carregarTarefas()
