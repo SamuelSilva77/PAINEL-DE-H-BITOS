@@ -1,6 +1,3 @@
-//API
-let api = fetch("https://697011fda06046ce61887960.mockapi.io/habitos");
-
 //BOTAO ADICIONAR
 let adicionar = document.querySelector(".adicionar");
 
@@ -50,13 +47,17 @@ adicionar.addEventListener("click", () => {
 });
 
 //CONCLUIR META
+let diaAtual = new Date().getDate()
+  if(diaAtual == 1){
+    diaAtual == 32
+  }
+
 async function concluiHoje(idSpan, barra, tarefa, meta){
   //API
   let api = await fetch("https://697011fda06046ce61887960.mockapi.io/habitos/")
   let respost = await api.json()
 
   //VERIFICAR SE JA FEZ A TAREFA HOJE
-  let diaAtual = new Date().getDate()
 
   respost.forEach((index) => {
     if(index.tarefa == tarefa){
@@ -64,7 +65,7 @@ async function concluiHoje(idSpan, barra, tarefa, meta){
     }
   })
   
-  if(diaAtual > diaArmazenado || diaAtual == 1){
+  if(diaAtual > diaArmazenado){
   //AUMENTAR DIAS CONCLUIDOS
   let dias = parseInt(document.getElementById(idSpan).innerHTML)
   document.getElementById(idSpan).innerHTML = dias + 1
@@ -97,9 +98,7 @@ async function concluiHoje(idSpan, barra, tarefa, meta){
         })
       })
     }
-  })
-
-  
+  })  
   }else{
     alert("Você já concluiu sua tarefa hoje!")
   }
@@ -131,17 +130,9 @@ async function deletar(tarefa){
 
 
 //CARREGAR TAREFAS
-async function passarDados(){
-  try{
-  let api = await fetch("https://697011fda06046ce61887960.mockapi.io/habitos")
-  return await api.json()
-  }catch(err){
-    alert("Erro! Tente novamente mais tarde")
-  }
-}
-
 async function carregarTarefas() {
-  let dados = await passarDados()
+  let api = await fetch("https://697011fda06046ce61887960.mockapi.io/habitos")
+  let dados = await api.json()
 
   dados.forEach((index) => {
         armazenar.innerHTML += `
