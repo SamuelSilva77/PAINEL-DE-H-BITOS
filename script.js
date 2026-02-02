@@ -10,7 +10,7 @@ adicionar.addEventListener("click", () => {
   if (tarefa) {
     let meta = Number(prompt("Digite sua meta para essa tarefa"));
     while (!meta) {
-      meta =  Number(prompt("Digite sua meta para essa tarefa"));
+      meta = Number(prompt("Digite sua meta para essa tarefa"));
     }
 
     armazenar.innerHTML += `
@@ -29,7 +29,7 @@ adicionar.addEventListener("click", () => {
         </div>
   `;
 
-  let dia = new Date().getDate() - 1
+    let dia = new Date().getDate() - 1;
 
     fetch("https://697011fda06046ce61887960.mockapi.io/habitos", {
       method: "POST",
@@ -38,104 +38,141 @@ adicionar.addEventListener("click", () => {
       },
       body: JSON.stringify({
         tarefa: tarefa,
-        meta: meta, 
+        meta: meta,
         diasConcluidos: 0,
-        ultimoDia: dia
+        ultimoDia: dia,
       }),
     });
   }
 });
 
 //CONCLUIR META
-let diaAtual = new Date().getDate()
-  if(diaAtual == 1){
-    diaAtual == 32
-  }
+let diaAtual = new Date().getDate();
 
-async function concluiHoje(idSpan, barra, tarefa, meta){
+async function concluiHoje(idSpan, barra, tarefa, meta) {
   //API
-  let api = await fetch("https://697011fda06046ce61887960.mockapi.io/habitos/")
-  let respost = await api.json()
+  let api = await fetch("https://697011fda06046ce61887960.mockapi.io/habitos/");
+  let respost = await api.json();
 
   //VERIFICAR SE JA FEZ A TAREFA HOJE
 
   respost.forEach((index) => {
-    if(index.tarefa == tarefa){
-      diaArmazenado = index.ultimoDia
-    }
-  })
-  
-  if(diaAtual > diaArmazenado){
-  //AUMENTAR DIAS CONCLUIDOS
-  let dias = parseInt(document.getElementById(idSpan).innerHTML)
-  document.getElementById(idSpan).innerHTML = dias + 1
-
-  //AUMENTAR BARRA DE PROGRESSO
-  let barraProgresso = document.getElementById(barra)
-  barraProgresso.value = dias + 1
-
-  //VERIFICAR SE BATEU A META
-  if(barraProgresso.value == meta){
-    meta = Number(prompt("Você bateu a meta! Insira uma nova"))
-    while(!meta){
-      meta = Number(prompt("Você bateu a meta! Insira uma nova"))
-    }
-  }
-  console.log(meta)
-  //SALVAR NA API
-  respost.forEach(index => {
-    if(index.tarefa == tarefa){
-      fetch("https://697011fda06046ce61887960.mockapi.io/habitos/" + index.id, {
-        method: "PUT",
-        headers: {
-          "content-type": "application/json"
-        },
-        body: JSON.stringify({
-          tarefa: tarefa,
-          meta: meta,
-          diasConcluidos: dias + 1,
-          ultimoDia: diaAtual
-        })
-      })
-    }
-  })  
-  }else{
-    alert("Você já concluiu sua tarefa hoje!")
-  }
-}
-
-
-//DELETAR TAREFA
-async function deletar(tarefa){
-  let div = document.getElementById(tarefa);
-  div.remove()
-
-  //DELETAR DA API
-  try{
-  let api = await fetch("https://697011fda06046ce61887960.mockapi.io/habitos");
-  let resposta = await api.json()
-
-  resposta.forEach(index => {
-    if(index.tarefa == tarefa){
-      fetch("https://697011fda06046ce61887960.mockapi.io/habitos/" + index.id, {
-        method: "DELETE"
-      })
+    if (index.tarefa == tarefa) {
+      diaArmazenado = index.ultimoDia;
     }
   });
-  }catch(err){
-    alert("Erro! Tente Novamente mais tarde")
-  }
 
+  if (diaAtual != diaArmazenado) {
+    //AUMENTAR DIAS CONCLUIDOS
+    let dias = parseInt(document.getElementById(idSpan).innerHTML);
+    document.getElementById(idSpan).innerHTML = dias + 1;
+
+    //AUMENTAR BARRA DE PROGRESSO
+    let barraProgresso = document.getElementById(barra);
+    barraProgresso.value = dias + 1;
+
+    //VERIFICAR SE BATEU A META
+    if (barraProgresso.value == meta) {
+      meta = Number(prompt("Você bateu a meta! Insira uma nova"));
+      while (!meta) {
+        meta = Number(prompt("Você bateu a meta! Insira uma nova"));
+      }
+    }
+    console.log(meta);
+    //SALVAR NA API
+    respost.forEach((index) => {
+      if (index.tarefa == tarefa) {
+        fetch(
+          "https://697011fda06046ce61887960.mockapi.io/habitos/" + index.id,
+          {
+            method: "PUT",
+            headers: {
+              "content-type": "application/json",
+            },
+            body: JSON.stringify({
+              tarefa: tarefa,
+              meta: meta,
+              diasConcluidos: dias + 1,
+              ultimoDia: diaAtual,
+            }),
+          },
+        );
+
+        setTimeout(() => {
+          location.reload()
+        }, 500)
+      }
+    });
+  } else {
+    alert("Você já concluiu sua tarefa hoje!");
+  }
 }
 
+//DELETAR TAREFA
+async function deletar(tarefa) {
+  let div = document.getElementById(tarefa);
+  div.remove();
+
+  //DELETAR DA API
+  try {
+    let api = await fetch(
+      "https://697011fda06046ce61887960.mockapi.io/habitos",
+    );
+    let resposta = await api.json();
+
+    resposta.forEach((index) => {
+      if (index.tarefa == tarefa) {
+        fetch(
+          "https://697011fda06046ce61887960.mockapi.io/habitos/" + index.id,
+          {
+            method: "DELETE",
+          },
+        );
+      }
+    });
+  } catch (err) {
+    alert("Erro! Tente Novamente mais tarde");
+  }
+}
 
 //CARREGAR TAREFAS
 async function carregarTarefas() {
-  let api = await fetch("https://697011fda06046ce61887960.mockapi.io/habitos")
-  let dados = await api.json()
+  let hoje = new Date().getDate();
+  let api = await fetch("https://697011fda06046ce61887960.mockapi.io/habitos");
+  let dados = await api.json();
 
   dados.forEach((index) => {
-        armazenar.innerHTML += `
+    if (index.ultimoDia + 1 < hoje) {
+      armazenar.innerHTML += `
+          <div class="card" id="${index.tarefa}">
+            <button class="deletar" onclick="deletar('${index.tarefa}')"> Deletar </button>   
+
+            <p> ${index.tarefa} </p>
+
+            <h3 > Dias Concluídos: <span id="span${index.tarefa}"> 0</span> </h3>
+            <br>
+            <h3> Meta De Dias: ${index.meta} </h3>
+
+            <progress value="${index.diasConcluidos}" max="${index.meta}" id="${index.tarefa + index.meta}"></progress>
+
+            <button class="concluir" onclick="concluiHoje('span${index.tarefa}', '${index.tarefa + index.meta}', '${index.tarefa}', '${index.meta}')"> Concluí Hoje!! </button>
+        </div>
+  `;
+
+  fetch("https://697011fda06046ce61887960.mockapi.io/habitos/" + index.id, {
+    method: "PUT",
+    headers: {
+      "content-type": "application/json"
+    },
+    body: JSON.stringify({
+      tarefa: index.tarefa,
+      meta: index.meta,
+      diasConcluidos: 0,
+      ultimoDia: hoje -  1
+    })
+  })
+    }else{
+    armazenar.innerHTML += `
           <div class="card" id="${index.tarefa}">
             <button class="deletar" onclick="deletar('${index.tarefa}')"> Deletar </button>   
 
@@ -150,7 +187,8 @@ async function carregarTarefas() {
             <button class="concluir" onclick="concluiHoje('span${index.tarefa}', '${index.tarefa + index.meta}', '${index.tarefa}', '${index.meta}')"> Concluí Hoje!! </button>
         </div>
   `;
-  })
+    }
+  });
 }
 
-carregarTarefas()
+carregarTarefas();
