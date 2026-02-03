@@ -4,10 +4,26 @@
   padding: 0;
 }
 
+body{
+  background-image: linear-gradient(rgb(230, 230, 230), rgb(252, 252, 252));
+  height: 100vh;
+}
+
 .tituloPagina {
-  text-align: center;
   margin: 25px 0;
   letter-spacing: 2px;
+  position: relative;
+  color: rgb(7, 7, 169);
+}
+
+.tituloPagina::before{
+  content: "";
+  position: absolute;
+  bottom: -8px;
+  left: -20px;
+  height: 5px;
+  width: 125%;
+  background-color: red;  
 }
 
 .armazenar {
@@ -26,6 +42,7 @@
   box-shadow: 0 0 5px black;
   border: 1px solid black;
   border-radius: 10px;
+  background-color: white;
 }
 
 @media (max-width: 570px) {
